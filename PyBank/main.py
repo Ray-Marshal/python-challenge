@@ -3,36 +3,49 @@ import os
 import csv
 
 filepath = ('C:\\Users\\mrrit\\OneDrive\\Documents\\UofO Data Class\\Wk3_Python\\python-challenge\\PyBank\\Resources\\budget_data.csv')
-Total_Months = 0
-Net_Profit_Loss = 0
-Average_Change = 0
-Great_Increase = 0
-Great_Inc_Date = 0
-Great_Decrease = 0
-Great_Dec_Date = 0
+total_months = 0
+net_profit_loss = 0
+great_increase = 0
+great_decrease = 0
+this_month = 0
+tot_cume_change = 0
 
 
-with open(filepath, encoding='utf') as budget_file:
+with open(filepath, "r", encoding='utf') as budget_file:
     
     budget_reader = csv.reader(budget_file, delimiter=",")
+    last_row = sum(1 for _ in budget_reader)
+    budget_file.seek(0)
     next(budget_reader, None)
 
-    for row in budget_reader:
-        inc_dec = int(row[1])
+    for row_num, row in enumerate(budget_reader, start=1):
+        last_month = this_month
+        this_month = int(row[1])
+        total_change = this_month - last_month
         date = row[0]
-        Total_Months += 1
-        Net_Profit_Loss += inc_dec
+        total_months += 1
+        net_profit_loss += this_month
 
-        if inc_dec > Great_Increase:
-            Great_Increase = inc_dec
-            Great_Inc_Date = date
+        if row_num == 0:
+            first_month = this_month
 
-        if inc_dec < Great_Decrease:
-            Great_Decrease = inc_dec
-            Great_Dec_Date = date
+        if total_change > great_increase:
+            great_increase = total_change
+            great_inc_date = date
 
+        if total_change < great_decrease:
+            great_decrease = total_change
+            great_dec_date = date
 
-    print(Great_Decrease)
-    print(Great_Dec_Date)
-    print(Great_Increase)
-    print(Great_Inc_Date)
+        if row_num == last_row:
+            tot_cume_change = this_month - first_month
+
+    average_change = tot_cume_change / total_months
+
+print("Financial Analysis")
+print("-------------------------")
+print(f"Total Months:{total_months}")
+print(f"Total: ${net_profit_loss}")
+print(f"Avereage Change: ${average_change}")
+print(f"Greatest Increase in Profits: {great_inc_date} (${great_increase})")
+print(f"Greatest Decrease in Profits: {great_dec_date} (${great_decrease})")
